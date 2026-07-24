@@ -22,7 +22,7 @@ yml_other_set()
    begin
       thread_pool = [];
       # GEOIP replace
-      geoip_pattern = /GEOIP,([A-Za-z]{2}),([^,]+)(,.*)?/;
+      geoip_pattern = /^GEOIP,([A-Za-z]{2}),([^,]+)(,.*)?/;
       match_pattern = /(^MATCH.*|^FINAL.*)/;
       thread_pool << Thread.new{
          #BT/P2P DIRECT Rules
@@ -424,7 +424,11 @@ yml_other_set()
    rescue Exception => e
       YAML.LOG_ERROR('Config File Overwrite Failed,【%s】' % [e.message])
    ensure
-      File.open('$2','w') {|f| YAML.dump(Value, f)};
+      begin
+         File.open('$2','w') {|f| YAML.dump(Value, f)};
+      rescue Exception => e
+         YAML.LOG_ERROR('Write file failed:【%s】' % [e.message])
+      end
    end" 2>/dev/null >> $LOG_FILE
 }
 
